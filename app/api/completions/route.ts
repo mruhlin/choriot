@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     }
 
     // Filter by specific group
-    if (groupId) {
+    if (groupId && whereClause.chore) {
       whereClause.chore.groupId = groupId
     }
 

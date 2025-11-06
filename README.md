@@ -198,11 +198,51 @@ npx prisma studio
 npx prisma generate
 ```
 
+### Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
 ### Linting
 
 ```bash
 npm run lint
 ```
+
+### Type Checking
+
+```bash
+npx tsc --noEmit
+```
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration. The CI pipeline runs automatically on:
+- Every pull request to `main`
+- Every push to `main`
+
+### CI Checks
+
+All PRs must pass the following checks before merging:
+- ✅ ESLint (code quality)
+- ✅ TypeScript compilation (type safety)
+- ✅ Jest tests (unit & integration tests)
+- ✅ Next.js build (deployment readiness)
+
+### Branch Protection
+
+To enable branch protection rules that prevent merging until CI passes:
+1. See [docs/BRANCH_PROTECTION.md](docs/BRANCH_PROTECTION.md) for detailed setup instructions
+2. Navigate to repository Settings → Branches
+3. Add a rule for `main` branch requiring "Test & Lint" status check
 
 ## Contributing
 

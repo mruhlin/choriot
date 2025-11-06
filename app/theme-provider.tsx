@@ -25,15 +25,14 @@ export function ThemeProvider({
   storageKey = "choriot-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme)
-
-  useEffect(() => {
-    // Load theme from localStorage on mount
-    const storedTheme = localStorage.getItem(storageKey) as Theme
-    if (storedTheme) {
-      setTheme(storedTheme)
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== "undefined") {
+      const storedTheme = localStorage.getItem(storageKey) as Theme
+      return storedTheme || defaultTheme
     }
-  }, [storageKey])
+    return defaultTheme
+  })
 
   useEffect(() => {
     const root = window.document.documentElement

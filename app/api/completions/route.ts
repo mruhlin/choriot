@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, unauthorizedResponse } from "@/lib/auth-helpers"
+import { Prisma } from "@prisma/client"
 
 // GET /api/completions - Get completion history
 export async function GET(req: Request) {
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
     })
     const groupIds = userGroupIds.map(g => g.groupId)
 
-    const whereClause: any = {
+    const whereClause: Prisma.ChoreCompletionWhereInput = {
       chore: {
         OR: [
           // Private chores
@@ -72,7 +73,7 @@ export async function GET(req: Request) {
     })
 
     return NextResponse.json(completions)
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

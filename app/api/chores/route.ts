@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, unauthorizedResponse } from "@/lib/auth-helpers"
 import { z } from "zod"
-import { RecurrenceType } from "@prisma/client"
+import { RecurrenceType, Prisma } from "@prisma/client"
 
 const createChoreSchema = z.object({
   title: z.string().min(1),
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     })
     const groupIds = userGroupIds.map(g => g.groupId)
 
-    const whereClause: any = {
+    const whereClause: Prisma.ChoreWhereInput = {
       OR: [
         // Private chores
         { createdById: user.id, groupId: null },
@@ -97,7 +97,7 @@ export async function GET(req: Request) {
     })
 
     return NextResponse.json(chores)
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

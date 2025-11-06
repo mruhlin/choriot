@@ -3,8 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { generateChoreInstances } from "@/lib/chore-schedule"
-import { addDays, format, startOfDay } from "date-fns"
-import Link from "next/link"
+import { addDays, startOfDay } from "date-fns"
 import DashboardClient from "./dashboard-client"
 
 export default async function DashboardPage() {

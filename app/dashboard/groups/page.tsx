@@ -58,7 +58,7 @@ export default async function GroupsPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {groups.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500 dark:text-gray-400 mb-4">You're not part of any groups yet</p>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">You&apos;re not part of any groups yet</p>
             <Link
               href="/dashboard/groups/new"
               className="inline-block bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600"

@@ -153,7 +153,7 @@ function generateDueDates(
 function getNextOccurrence(
   date: Date,
   recurrenceType: RecurrenceType,
-  recurrenceValue: number | null
+  _recurrenceValue: number | null
 ): Date {
   switch (recurrenceType) {
     case "DAILY":

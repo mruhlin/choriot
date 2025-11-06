@@ -7,7 +7,7 @@ import Link from "next/link"
 
 export default function NewGroupPage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -46,7 +46,7 @@ export default function NewGroupPage() {
 
       router.push("/dashboard")
       router.refresh()
-    } catch (error) {
+    } catch (_error) {
       setError("Something went wrong")
     } finally {
       setLoading(false)
@@ -82,7 +82,7 @@ export default function NewGroupPage() {
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Create a group to share chores with family members or housemates. You'll be the group admin and can invite others by email.
+            Create a group to share chores with family members or housemates. You&apos;ll be the group admin and can invite others by email.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -7,10 +7,11 @@ import Link from "next/link"
 
 export default function NewChorePage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [groups, setGroups] = useState<any[]>([])
+  type Group = { id: string; name: string }
+  const [groups, setGroups] = useState<Group[]>([])
 
   // Get tomorrow's date as default
   const tomorrow = new Date()
@@ -43,8 +44,8 @@ export default function NewChorePage() {
           const data = await response.json()
           setGroups(data)
         }
-      } catch (error) {
-        console.error("Failed to fetch groups:", error)
+      } catch (_error) {
+        console.error("Failed to fetch groups:", _error)
       }
     }
     
@@ -63,7 +64,18 @@ export default function NewChorePage() {
       const [year, month, day] = formData.startDate.split('-').map(Number)
       const startDateLocal = new Date(year, month - 1, day)
       
-      const payload: any = {
+      type ChorePayload = {
+        title: string
+        description?: string
+        groupId?: string
+        recurrenceType: string
+        startDate: string
+        points: number
+        dueTime?: string
+        recurrenceValue?: number
+      }
+
+      const payload: ChorePayload = {
         title: formData.title,
         description: formData.description || undefined,
         groupId: formData.groupId || undefined,
@@ -95,7 +107,7 @@ export default function NewChorePage() {
 
       router.push("/dashboard")
       router.refresh()
-    } catch (error) {
+    } catch (_error) {
       setError("Something went wrong")
     } finally {
       setLoading(false)
@@ -181,7 +193,7 @@ export default function NewChorePage() {
                 ))}
               </select>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Leave as "Private" for personal chores, or select a group to share
+                Leave as &ldquo;Private&rdquo; for personal chores, or select a group to share
               </p>
             </div>
 

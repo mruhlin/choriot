@@ -65,7 +65,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
         const data = await response.json()
         alert(data.error || "Failed to complete chore")
       }
-    } catch (error) {
+    } catch (_error) {
       alert("Something went wrong")
     } finally {
       setCompleting(null)
@@ -204,7 +204,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
               </div>
             ) : (
               <div className="space-y-6">
-                {groupsWithCollapse.map((item, idx) => {
+                {groupsWithCollapse.map((item) => {
                   if (item.type === 'visible') {
                     const group = item.group
                     const isExpanded = expandedRecurringDates.has(group.dateKey)

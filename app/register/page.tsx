@@ -32,7 +32,7 @@ export default function RegisterPage() {
       }
 
       router.push("/login?registered=true")
-    } catch (error) {
+    } catch (_error) {
       setError("Something went wrong")
     } finally {
       setLoading(false)

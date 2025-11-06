@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Core application models
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  memberships   GroupMembership[]
+  choresCreated Chore[]           @relation("ChoreCreator")
+  choresAssigned ChoreAssignment[]
+  completions   ChoreCompletion[]
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  memberships GroupMembership[]
+  chores      Chore[]
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
+}
+
+model GroupMembership {
+  id        String    @id @default(cuid())
+  userId    String
+  groupId   String
+  role      GroupRole @default(MEMBER)
+  joinedAt  DateTime  @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+enum RecurrenceType {
+  NONE
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+model Chore {
+  id               String         @id @default(cuid())
+  title            String
+  description      String?
+  createdById      String
+  groupId          String?        // null = private chore
+  recurrenceType   RecurrenceType @default(NONE)
+  recurrenceValue  Int?           // e.g., day of week (0-6), day of month (1-31)
+  startDate        DateTime       @default(now())
+  dueTime          String?        // HH:MM format
+  points           Int            @default(1)
+  isActive         Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  createdBy   User                @relation("ChoreCreator", fields: [createdById], references: [id])
+  group       Group?              @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  assignments ChoreAssignment[]
+  completions ChoreCompletion[]
+}
+
+model ChoreAssignment {
+  id        String   @id @default(cuid())
+  choreId   String
+  userId    String
+  dueDate   DateTime
+  createdAt DateTime @default(now())
+
+  chore Chore @relation(fields: [choreId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([choreId, userId, dueDate])
+}
+
+model ChoreCompletion {
+  id          String   @id @default(cuid())
+  choreId     String
+  userId      String
+  completedAt DateTime @default(now())
+  notes       String?
+  dueDate     DateTime // The date this chore was due (for tracking which instance was completed)
+
+  chore Chore @relation(fields: [choreId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

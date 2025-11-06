@@ -1,36 +1,217 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Choriot - Family Chore Tracking App
+
+**Carry your chores to completion** 🏛️
+
+A Next.js application for tracking family chores with recurring tasks, group management, and completion history.
+
+## Features (MVP)
+
+### Authentication & Users
+- User registration and login with email/password
+- Secure authentication using NextAuth.js
+- Individual user accounts
+
+### Groups
+- Create and join multiple groups
+- Share chores with group members
+- Admin/Member role system
+- Invite users by email
+
+### Chores
+- Create private chores (individual) or group chores
+- One-time or recurring chores (Daily, Weekly, Biweekly, Monthly)
+- Assign chores to specific users
+- Set due dates and times
+- Add descriptions and point values
+- Mark chores as complete
+
+### Dashboard
+- Unified schedule showing chores from all groups
+- 14-day view of upcoming chores
+- "Today" and "Tomorrow" quick views
+- Overdue chore indicators
+- Points tracking system
+- Completion history with timestamps
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Database**: SQLite with Prisma ORM
+- **Authentication**: NextAuth.js v4
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
+- **Date Handling**: date-fns
+
+## Database Schema
+
+### Core Models
+- `User` - User accounts with authentication
+- `Group` - Shared chore groups
+- `GroupMembership` - User-group relationships with roles
+- `Chore` - Chore definitions with recurrence rules
+- `ChoreAssignment` - Manual chore assignments to users
+- `ChoreCompletion` - Completion log with timestamps
+
+### Recurrence Types
+- `NONE` - One-time chore
+- `DAILY` - Repeats every day
+- `WEEKLY` - Repeats every week
+- `BIWEEKLY` - Repeats every 2 weeks
+- `MONTHLY` - Repeats every month
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Installation
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Set up environment variables**:
+   The `.env` file has been created with defaults. For production, update:
+   ```
+   NEXTAUTH_SECRET="your-secret-key-change-this-in-production"
+   ```
+
+3. **Initialize the database**:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+4. **Generate Prisma Client**:
+   ```bash
+   npx prisma generate
+   ```
+
+5. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser** to `http://localhost:3000`
+
+## Project Structure
+
+```
+choriot/
+├── app/
+│   ├── api/
+│   │   ├── auth/          # Authentication endpoints
+│   │   ├── chores/        # Chore CRUD operations
+│   │   ├── groups/        # Group management
+│   │   └── completions/   # Completion history
+│   ├── dashboard/         # Main dashboard
+│   ├── login/             # Login page
+│   ├── register/          # Registration page
+│   └── layout.tsx         # Root layout
+├── lib/
+│   ├── auth.ts            # NextAuth configuration
+│   ├── auth-helpers.ts    # Auth utility functions
+│   ├── prisma.ts          # Prisma client singleton
+│   └── chore-schedule.ts  # Recurrence logic
+├── prisma/
+│   ├── schema.prisma      # Database schema
+│   └── migrations/        # Database migrations
+└── types/
+    └── next-auth.d.ts     # NextAuth type extensions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API Endpoints
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Authentication
+- `POST /api/auth/register` - Create new user
+- `POST /api/auth/[...nextauth]` - NextAuth handlers
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Groups
+- `GET /api/groups` - List user's groups
+- `POST /api/groups` - Create new group
+- `POST /api/groups/[groupId]/invite` - Invite user to group
 
-## Learn More
+### Chores
+- `GET /api/chores` - List chores (with optional groupId filter)
+- `POST /api/chores` - Create new chore
+- `POST /api/chores/[choreId]/assign` - Assign chore to user
+- `POST /api/chores/[choreId]/complete` - Mark chore complete
 
-To learn more about Next.js, take a look at the following resources:
+### Completions
+- `GET /api/completions` - Get completion history (filterable)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Creating Your First Chore
 
-## Deploy on Vercel
+1. Register an account
+2. Click "New Chore" in the dashboard
+3. Enter chore details:
+   - Title (required)
+   - Description (optional)
+   - Recurrence pattern
+   - Due time
+   - Points value
+4. Choose private or assign to a group
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Managing Groups
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Click "Create Group" in the sidebar
+2. Name your group
+3. Invite members by email
+4. Create group chores that all members can see
+
+### Completing Chores
+
+- Click the "Complete" button next to any chore
+- Completion is logged with your name and timestamp
+- Points are added to your total
+
+## Future Enhancements (Post-MVP)
+
+- Automatic rotation of chores among group members
+- Notifications for upcoming/overdue chores
+- Filtering and sorting options
+- User profile pages with stats
+- Mobile app
+- Calendar view
+- Chore templates
+- Rewards/achievements system
+- Photo proof of completion
+
+## Development
+
+### Database Commands
+
+```bash
+# Create a migration
+npx prisma migrate dev --name migration_name
+
+# Reset database (WARNING: deletes data)
+npx prisma migrate reset
+
+# Open Prisma Studio (database GUI)
+npx prisma studio
+
+# Generate Prisma Client
+npx prisma generate
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## Contributing
+
+This is an MVP built for personal/family use. Feel free to fork and customize for your needs!
+
+## License
+
+MIT
+
+---
+
+Built with ❤️ using Next.js

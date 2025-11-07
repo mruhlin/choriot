@@ -4,6 +4,9 @@
 
 A Next.js application for tracking family chores with recurring tasks, group management, and completion history.
 
+## Project Goals
+This project is an experiment in vibe coding using Warp AI.  No human wrote a single line of code in this repo.
+
 ## Features (MVP)
 
 ### Authentication & Users

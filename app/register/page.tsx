@@ -1,16 +1,44 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+
+// Common timezone options
+const TIMEZONE_OPTIONS = [
+  { value: "America/New_York", label: "Eastern Time (ET)" },
+  { value: "America/Chicago", label: "Central Time (CT)" },
+  { value: "America/Denver", label: "Mountain Time (MT)" },
+  { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
+  { value: "America/Anchorage", label: "Alaska Time (AKT)" },
+  { value: "Pacific/Honolulu", label: "Hawaii Time (HT)" },
+  { value: "Europe/London", label: "London (GMT/BST)" },
+  { value: "Europe/Paris", label: "Paris (CET/CEST)" },
+  { value: "Asia/Tokyo", label: "Tokyo (JST)" },
+  { value: "Australia/Sydney", label: "Sydney (AEDT/AEST)" },
+]
 
 export default function RegisterPage() {
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [timezone, setTimezone] = useState("America/Los_Angeles")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  // Detect browser timezone on mount
+  useEffect(() => {
+    try {
+      const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      if (browserTimezone) {
+        setTimezone(browserTimezone)
+      }
+    } catch (_error) {
+      // Fall back to Pacific Time if detection fails
+      setTimezone("America/Los_Angeles")
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,7 +49,7 @@ export default function RegisterPage() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, timezone }),
       })
 
       const data = await response.json()
@@ -88,6 +116,30 @@ export default function RegisterPage() {
               minLength={6}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+
+          <div>
+            <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Time Zone
+            </label>
+            <select
+              id="timezone"
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {TIMEZONE_OPTIONS.map(tz => (
+                <option key={tz.value} value={tz.value}>
+                  {tz.label}
+                </option>
+              ))}
+              {!TIMEZONE_OPTIONS.find(tz => tz.value === timezone) && (
+                <option value={timezone}>{timezone}</option>
+              )}
+            </select>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Detected from your browser
+            </p>
           </div>
 
           {error && (

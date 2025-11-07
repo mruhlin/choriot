@@ -7,12 +7,13 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().optional(),
+  timezone: z.string().default("America/Los_Angeles"),
 })
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { email, password, name } = registerSchema.parse(body)
+    const { email, password, name, timezone } = registerSchema.parse(body)
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -35,11 +36,13 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         name,
+        timezone,
       },
       select: {
         id: true,
         email: true,
         name: true,
+        timezone: true,
       }
     })
 

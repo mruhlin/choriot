@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { signOut } from "next-auth/react"
 import { format, isToday, isTomorrow, isPast } from "date-fns"
+import { formatInTimeZone } from "date-fns-tz"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -14,6 +15,7 @@ interface DashboardClientProps {
     id: string
     name?: string | null
     email: string
+    timezone: string
   }
   choreInstances: ChoreInstance[]
   groups: Array<{
@@ -75,7 +77,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
   const getDayLabel = (date: Date) => {
     if (isToday(date)) return "Today"
     if (isTomorrow(date)) return "Tomorrow"
-    return format(date, "EEEE, MMM d")
+    return formatInTimeZone(date, user.timezone, "EEEE, MMM d")
   }
 
   const toggleRecurringExpanded = (dateKey: string) => {
@@ -265,7 +267,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                                     {instance.isCompleted && instance.completedBy && (
                                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         Completed by {instance.completedBy.name || "someone"} 
-                                        {instance.completedAt && ` at ${format(instance.completedAt, "h:mm a")}`}
+                                        {instance.completedAt && ` at ${formatInTimeZone(instance.completedAt, user.timezone, "h:mm a")}`}
                                       </p>
                                     )}
                                   </div>
@@ -338,7 +340,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                           className="w-full text-left px-6 py-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 flex items-center justify-between"
                         >
                           <span>
-                            {isExpanded ? "▼" : "▶"} {format(range.startDate, "MMM d")} – {format(range.endDate, "MMM d")}
+                            {isExpanded ? "▼" : "▶"} {formatInTimeZone(range.startDate, user.timezone, "MMM d")} – {formatInTimeZone(range.endDate, user.timezone, "MMM d")}
                           </span>
                           <span className="text-sm text-gray-500 dark:text-gray-400">...
                           </span>
@@ -404,7 +406,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                                               {instance.isCompleted && instance.completedBy && (
                                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                   Completed by {instance.completedBy.name || "someone"} 
-                                                  {instance.completedAt && ` at ${format(instance.completedAt, "h:mm a")}`}
+                                                  {instance.completedAt && ` at ${formatInTimeZone(instance.completedAt, user.timezone, "h:mm a")}`}
                                                 </p>
                                               )}
                                             </div>

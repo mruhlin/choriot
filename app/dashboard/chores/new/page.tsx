@@ -25,7 +25,7 @@ export default function NewChorePage() {
     recurrenceType: "NONE",
     recurrenceValue: "",
     startDate: tomorrowStr,
-    dueTime: "",
+    dueTime: "09:00",
     points: "1",
   })
 
@@ -234,7 +234,7 @@ export default function NewChorePage() {
             {/* Due Time */}
             <div>
               <label htmlFor="dueTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Due Time (optional)
+                Due Time
               </label>
               <input
                 id="dueTime"
@@ -243,6 +243,9 @@ export default function NewChorePage() {
                 onChange={(e) => setFormData({ ...formData, dueTime: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Time in your local timezone
+              </p>
             </div>
 
             {/* Points */}

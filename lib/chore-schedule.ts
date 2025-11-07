@@ -1,4 +1,5 @@
-import { addDays, addWeeks, addMonths, startOfDay, isBefore, isAfter } from "date-fns"
+import { addDays, addWeeks, addMonths, isBefore, isAfter } from "date-fns"
+import { toZonedTime, fromZonedTime } from "date-fns-tz"
 import { RecurrenceType } from "@prisma/client"
 
 export interface ChoreInstance {
@@ -52,7 +53,8 @@ interface Chore {
 export function generateChoreInstances(
   chores: Chore[],
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  timezone: string = "America/Los_Angeles"
 ): ChoreInstance[] {
   const instances: ChoreInstance[] = []
   const isRecurringMap = new Map<string, boolean>()
@@ -66,18 +68,21 @@ export function generateChoreInstances(
       chore.recurrenceValue,
       chore.startDate,
       startDate,
-      endDate
+      endDate,
+      timezone
     )
 
     for (const dueDate of choreDueDates) {
+      const dueDateStart = startOfDayInTimezone(dueDate, timezone)
+      
       // Find assignment for this date
       const assignment = chore.assignments.find(
-        a => startOfDay(a.dueDate).getTime() === startOfDay(dueDate).getTime()
+        a => startOfDayInTimezone(a.dueDate, timezone).getTime() === dueDateStart.getTime()
       )
 
       // Check if completed
       const completion = chore.completions.find(
-        c => startOfDay(c.dueDate).getTime() === startOfDay(dueDate).getTime()
+        c => startOfDayInTimezone(c.dueDate, timezone).getTime() === dueDateStart.getTime()
       )
 
       instances.push({
@@ -116,15 +121,22 @@ export function generateChoreInstances(
   }))
 }
 
+function startOfDayInTimezone(date: Date, timezone: string): Date {
+  const zonedDate = toZonedTime(date, timezone)
+  zonedDate.setHours(0, 0, 0, 0)
+  return fromZonedTime(zonedDate, timezone)
+}
+
 function generateDueDates(
   recurrenceType: RecurrenceType,
   recurrenceValue: number | null,
   choreStartDate: Date,
   rangeStart: Date,
-  rangeEnd: Date
+  rangeEnd: Date,
+  timezone: string
 ): Date[] {
   const dates: Date[] = []
-  const start = startOfDay(choreStartDate)
+  const start = startOfDayInTimezone(choreStartDate, timezone)
 
   if (recurrenceType === "NONE") {
     // One-time chore

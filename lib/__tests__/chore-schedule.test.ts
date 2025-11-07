@@ -3,6 +3,8 @@ import { RecurrenceType } from '@prisma/client'
 
 describe('chore-schedule', () => {
   describe('generateChoreInstances', () => {
+    // Use UTC as timezone for tests to have predictable behavior
+    const timezone = 'UTC'
     const startDate = new Date('2024-01-01T00:00:00.000Z')
     const endDate = new Date('2024-01-14T00:00:00.000Z')
 
@@ -24,7 +26,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances).toHaveLength(1)
       expect(instances[0]).toMatchObject({
@@ -55,7 +57,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances).toHaveLength(0)
     })
@@ -78,7 +80,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances).toHaveLength(14) // 14 days
       expect(instances[0].dueDate).toEqual(new Date('2024-01-01T00:00:00.000Z'))
@@ -104,7 +106,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances).toHaveLength(2) // 2 weeks
       expect(instances[0].dueDate).toEqual(new Date('2024-01-01T00:00:00.000Z'))
@@ -130,7 +132,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances).toHaveLength(1)
       expect(instances[0].dueDate).toEqual(new Date('2024-01-01T00:00:00.000Z'))
@@ -156,7 +158,7 @@ describe('chore-schedule', () => {
 
       const rangeStart = new Date('2024-01-01T00:00:00.000Z')
       const rangeEnd = new Date('2024-03-31T00:00:00.000Z')
-      const instances = generateChoreInstances(chores, rangeStart, rangeEnd)
+      const instances = generateChoreInstances(chores, rangeStart, rangeEnd, timezone)
 
       expect(instances).toHaveLength(3) // Jan, Feb, Mar
       expect(instances[0].dueDate).toEqual(new Date('2024-01-01T00:00:00.000Z'))
@@ -189,7 +191,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       const completedInstance = instances.find(
         i => i.dueDate.toISOString().startsWith('2024-01-02')
@@ -228,7 +230,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances[0].assignedUser).toEqual({
         id: 'user-2',
@@ -268,7 +270,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       // First two are completed, third should be marked as first uncompleted
       expect(instances[0].isFirstUncompletedOccurrence).toBe(false)
@@ -309,7 +311,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances).toHaveLength(2)
       expect(instances[0].title).toBe('Chore A')
@@ -334,7 +336,7 @@ describe('chore-schedule', () => {
         },
       ]
 
-      const instances = generateChoreInstances(chores, startDate, endDate)
+      const instances = generateChoreInstances(chores, startDate, endDate, timezone)
 
       expect(instances.length).toBeGreaterThan(0)
       expect(instances[0].dueDate.getTime()).toBeGreaterThanOrEqual(startDate.getTime())

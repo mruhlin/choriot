@@ -3,7 +3,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { generateChoreInstances } from "@/lib/chore-schedule"
-import { addDays, startOfDay } from "date-fns"
+import { addDays } from "date-fns"
+import { toZonedTime, fromZonedTime } from "date-fns-tz"
 import DashboardClient from "./dashboard-client"
 
 export default async function DashboardPage() {
@@ -12,6 +13,18 @@ export default async function DashboardPage() {
   if (!session?.user) {
     redirect("/login")
   }
+
+  // Fetch full user data including timezone
+  const userData = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, name: true, email: true, timezone: true }
+  })
+
+  if (!userData) {
+    redirect("/login")
+  }
+
+  const userTimezone = userData.timezone || "America/Los_Angeles"
 
   // Fetch user's groups
   const userGroupIds = await prisma.groupMembership.findMany({
@@ -48,10 +61,13 @@ export default async function DashboardPage() {
     }
   })
 
-  // Generate chore instances for the next 14 days
-  const today = startOfDay(new Date())
+  // Generate chore instances for the next 14 days in user's timezone
+  const now = new Date()
+  const todayInUserTz = toZonedTime(now, userTimezone)
+  todayInUserTz.setHours(0, 0, 0, 0)
+  const today = fromZonedTime(todayInUserTz, userTimezone)
   const endDate = addDays(today, 14)
-  const choreInstances = generateChoreInstances(chores, today, endDate)
+  const choreInstances = generateChoreInstances(chores, today, endDate, userTimezone)
 
   // Fetch groups
   const groups = await prisma.group.findMany({
@@ -70,7 +86,7 @@ export default async function DashboardPage() {
   })
 
   return <DashboardClient 
-    user={session.user} 
+    user={{...userData}} 
     choreInstances={choreInstances}
     groups={groups}
   />

@@ -2,15 +2,15 @@ import { sendEmail, sendPasswordResetEmail } from '../email'
 
 describe('email service', () => {
   let consoleSpy: jest.SpyInstance
+  const originalNodeEnv = process.env.NODE_ENV
 
   beforeEach(() => {
     consoleSpy = jest.spyOn(console, 'log').mockImplementation()
-    process.env.NODE_ENV = 'development'
   })
 
   afterEach(() => {
     consoleSpy.mockRestore()
-    delete process.env.NODE_ENV
+    process.env = { ...process.env, NODE_ENV: originalNodeEnv }
   })
 
   describe('sendEmail', () => {
@@ -47,7 +47,8 @@ describe('email service', () => {
     })
 
     it('should throw error in production mode', async () => {
-      process.env.NODE_ENV = 'production'
+      const originalEnv = process.env
+      process.env = { ...originalEnv, NODE_ENV: 'production' }
 
       const options = {
         to: 'test@example.com',
@@ -58,6 +59,8 @@ describe('email service', () => {
       await expect(sendEmail(options)).rejects.toThrow(
         'Production email sending not yet implemented'
       )
+
+      process.env = originalEnv
     })
   })
 

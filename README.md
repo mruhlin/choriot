@@ -1,11 +1,11 @@
-# Choriot - Family Chore Tracking App
+![logo](./public/logo.png)
 
-**Carry your chores to completion** 🏛️
+# Choriot - The Chore Tracker that Carries your Chores to Completion
 
 A Next.js application for tracking family chores with recurring tasks, group management, and completion history.
 
 ## Project Goals
-This project is an experiment in vibe coding using Warp AI.  No human wrote a single line of code in this repo.
+This project is an experiment in vibe coding using Warp AI.  My goal is to build this without writing a single line of code myself, or as few as possible.  
 
 ## Features (MVP)
 

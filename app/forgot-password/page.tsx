@@ -1,37 +1,39 @@
 "use client"
 
-import { signIn } from "next-auth/react"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 
-export default function LoginPage() {
-  const router = useRouter()
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [message, setMessage] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setMessage("")
     setLoading(true)
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
       })
 
-      if (result?.error) {
-        setError("Invalid email or password")
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage(data.message)
+        setEmail("") // Clear the form
       } else {
-        router.push("/dashboard")
-        router.refresh()
+        setError(data.error || "Something went wrong")
       }
-    } catch (_error) {
+    } catch {
       setError("Something went wrong")
     } finally {
       setLoading(false)
@@ -47,12 +49,15 @@ export default function LoginPage() {
             <Image 
               src="/logo.png" 
               alt="Choriot Logo" 
-              width={360} 
-              height={360}
+              width={200} 
+              height={200}
               className="object-contain"
             />
           </div>
-          <p className="text-gray-600 dark:text-gray-300">Carry your chores to completion</p>
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">Forgot Password</h2>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
+            Enter your email and we&apos;ll send you a link to reset your password
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,27 +75,14 @@ export default function LoginPage() {
             />
           </div>
 
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              <Link href="/forgot-password" className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
-                Forgot password?
-              </Link>
-            </div>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
           {error && (
             <div className="text-red-600 dark:text-red-400 text-sm">{error}</div>
+          )}
+
+          {message && (
+            <div className="text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-3 rounded-md">
+              {message}
+            </div>
           )}
 
           <button
@@ -98,16 +90,24 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-            Register
-          </Link>
-        </p>
+        <div className="mt-6 text-center space-y-2">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Remember your password?{" "}
+            <Link href="/login" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+              Sign in
+            </Link>
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Don&apos;t have an account?{" "}
+            <Link href="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+              Register
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "test": "TZ=UTC jest",
     "test:watch": "TZ=UTC jest --watch",
-    "test:coverage": "TZ=UTC jest --coverage"
+    "test:coverage": "TZ=UTC jest --coverage",
+    "test:ci": "npm run typecheck && npm run lint && npm test"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

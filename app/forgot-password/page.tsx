@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
       } else {
         setError(data.error || "Something went wrong")
       }
-    } catch (_error) {
+    } catch {
       setError("Something went wrong")
     } finally {
       setLoading(false)

@@ -1,7 +1,6 @@
 import { POST } from '../route'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { NextResponse } from 'next/server'
 
 // Mock dependencies
 jest.mock('@/lib/prisma', () => ({
@@ -102,17 +101,6 @@ describe('POST /api/auth/reset-password', () => {
   })
 
   it('should return error for expired token', async () => {
-    const expiredToken = {
-      id: 'token-1',
-      userId: 'user-1',
-      token: 'hashed-token',
-      expires: new Date(Date.now() - 1000), // expired 1 second ago
-      user: {
-        id: 'user-1',
-        email: 'test@example.com',
-      },
-    }
-
     // findMany filters out expired tokens, so return empty array
     ;(prisma.passwordResetToken.findMany as jest.Mock).mockResolvedValue([])
 

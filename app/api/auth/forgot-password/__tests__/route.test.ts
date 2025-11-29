@@ -2,7 +2,6 @@ import { POST } from '../route'
 import { prisma } from '@/lib/prisma'
 import { sendPasswordResetEmail } from '@/lib/email'
 import bcrypt from 'bcryptjs'
-import { NextResponse } from 'next/server'
 
 // Mock dependencies
 jest.mock('@/lib/prisma', () => ({

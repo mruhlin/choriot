@@ -67,7 +67,10 @@ export default async function DashboardPage() {
   todayInUserTz.setHours(0, 0, 0, 0)
   const today = fromZonedTime(todayInUserTz, userTimezone)
   const endDate = addDays(today, 14)
-  const choreInstances = generateChoreInstances(chores, today, endDate, userTimezone)
+  const allChoreInstances = generateChoreInstances(chores, today, endDate, userTimezone)
+  
+  // Filter out completed chores for the home view
+  const choreInstances = allChoreInstances.filter(instance => !instance.isCompleted)
 
   // Fetch groups
   const groups = await prisma.group.findMany({

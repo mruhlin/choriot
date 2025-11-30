@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import Link from "next/link"
 
 export default async function Home() {
+  console.log("hello world")
   const session = await getServerSession(authOptions)
 
   if (session) {

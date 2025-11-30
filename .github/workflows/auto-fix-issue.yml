@@ -6,7 +6,7 @@ on:
 
 jobs:
   auto-fix:
-    if: github.event.label.name == 'warp-agent'
+    if: github.event.label.name == 'warp-agent' 
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -46,14 +46,18 @@ jobs:
 
             Instructions:
             1. Analyze the issue description carefully
-            2. Search the codebase to understand the current implementation
-            3. Create a new branch named 'fix/issue-${{ github.event.issue.number }}'
-            4. Implement the fix or feature with clean, maintainable code
-            5. Ensure 100% test coverage for any new functionality you add
-            6. Run all tests locally to verify your changes
-            7. Commit your changes with a descriptive message
-            8. Open a pull request to merge your branch into main with title: "${{ github.event.issue.title }} (fix #${{ github.event.issue.number }})"
-            9. If you cannot fix the issue automatically, comment on the issue explaining why and what manual intervention is needed
+            2. Analyze all comments on the issue and see if there are any clarifications or additional context
+            3. Search the codebase to understand the current implementation
+            4. Plan a solution that adheres to best practices and project conventions
+            5. If you cannot fix the issue automatically, comment on the issue explaining why and what manual intervention is needed, then skip the remaining steps
+            6. Create a new branch named 'fix/issue-${{ github.event.issue.number }}' unless it already exists:
+              a. if a branch with that name already exists, use it 
+              b. ensure it is up to date with main
+            7. Implement the fix or feature with clean, maintainable code
+            8. Ensure 100% test coverage for any new functionality you add
+            9. Run all tests locally to verify your changes
+            10. Commit your changes with a descriptive message
+            11. Open a pull request to merge your branch into main with title: "${{ github.event.issue.title }} (fix #${{ github.event.issue.number }})"
 
             Project context:
             - This is the Choriot app (inspired by a Roman Chariot that carries chores to completion)

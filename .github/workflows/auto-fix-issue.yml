@@ -1,0 +1,58 @@
+name: Auto-fix Issue with Warp Agent
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  auto-fix:
+    if: github.event.label.name == 'warp-agent'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run Warp Agent to fix issue
+        uses: warpdotdev/warp-agent-action@main
+        with:
+          warp_api_key: ${{ secrets.WARP_API_KEY }}
+          prompt: |
+            An issue has been opened requesting a fix or feature. Please analyze the issue and attempt to implement a solution.
+
+            Issue Title: ${{ github.event.issue.title }}
+            Issue Number: ${{ github.event.issue.number }}
+            Issue Body: ${{ github.event.issue.body }}
+
+            Instructions:
+            1. Analyze the issue description carefully
+            2. Search the codebase to understand the current implementation
+            3. Create a new branch named 'fix/issue-${{ github.event.issue.number }}'
+            4. Implement the fix or feature with clean, maintainable code
+            5. Ensure 100% test coverage for any new functionality you add
+            6. Run all tests locally to verify your changes
+            7. Commit your changes with a descriptive message
+            8. Open a pull request to merge your branch into main with title: "${{ github.event.issue.title }} (fix #${{ github.event.issue.number }})"
+            9. If you cannot fix the issue automatically, comment on the issue explaining why and what manual intervention is needed
+
+            Project context:
+            - This is the Choriot app (inspired by a Roman Chariot that carries chores to completion)
+            - Follow the existing code patterns and style
+            - Use TypeScript, Next.js, Prisma, and other technologies found in the codebase
+            - Database URL for testing: file:./test.db

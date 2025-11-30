@@ -294,8 +294,9 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                                       onClick={() => handleComplete(instance.choreId, instance.dueDate)}
                                       disabled={completing === key}
                                       className="ml-4 bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 disabled:opacity-50"
+                                      title="Mark as complete"
                                     >
-                                      {completing === key ? "..." : "Complete"}
+                                      {completing === key ? "..." : "✓"}
                                     </button>
                                   )}
                                 </div>
@@ -331,8 +332,9 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                                             onClick={() => handleComplete(instance.choreId, instance.dueDate)}
                                             disabled={completing === key}
                                             className="ml-4 bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 disabled:opacity-50"
+                                            title="Mark as complete"
                                           >
-                                            {completing === key ? "..." : "Done"}
+                                            {completing === key ? "..." : "✓"}
                                           </button>
                                         </li>
                                       )
@@ -433,8 +435,9 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                                                 onClick={() => handleComplete(instance.choreId, instance.dueDate)}
                                                 disabled={completing === key}
                                                 className="ml-4 bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 disabled:opacity-50"
+                                                title="Mark as complete"
                                               >
-                                                {completing === key ? "..." : "Complete"}
+                                                {completing === key ? "..." : "✓"}
                                               </button>
                                             )}
                                           </div>
@@ -470,8 +473,9 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                                                       onClick={() => handleComplete(instance.choreId, instance.dueDate)}
                                                       disabled={completing === key}
                                                       className="ml-4 bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 disabled:opacity-50"
+                                                      title="Mark as complete"
                                                     >
-                                                      {completing === key ? "..." : "Done"}
+                                                      {completing === key ? "..." : "✓"}
                                                     </button>
                                                   </li>
                                                 )

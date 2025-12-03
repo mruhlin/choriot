@@ -58,6 +58,7 @@ jobs:
             9. Run all tests locally to verify your changes
             10. Commit your changes with a descriptive message
             11. Open a pull request to merge your branch into main with title: "${{ github.event.issue.title }} (fix #${{ github.event.issue.number }})"
+            12. Make sure the PR description includes the string "Fixes #${{ github.event.issue.number }}" to auto-link the PR to the issue
 
             Project context:
             - This is the Choriot app (inspired by a Roman Chariot that carries chores to completion)

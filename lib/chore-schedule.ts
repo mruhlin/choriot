@@ -1,6 +1,6 @@
 import { addDays, addWeeks, addMonths, isBefore, isAfter } from "date-fns"
 import { toZonedTime, fromZonedTime } from "date-fns-tz"
-import { RecurrenceType } from "@prisma/client"
+import { RecurrenceType } from "@/generated/prisma/index"
 
 export interface ChoreInstance {
   choreId: string

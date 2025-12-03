@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, unauthorizedResponse } from "@/lib/auth-helpers"
 import { z } from "zod"
-import { RecurrenceType, Prisma } from "@prisma/client"
+import { RecurrenceType, Prisma } from "@/generated/prisma/index"
 
 const createChoreSchema = z.object({
   title: z.string().min(1),

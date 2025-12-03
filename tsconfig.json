@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/generated/prisma/index": ["./src/generated/prisma/index"]
     }
   },
   "include": [

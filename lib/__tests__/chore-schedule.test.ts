@@ -1,5 +1,5 @@
 import { generateChoreInstances } from '../chore-schedule'
-import { RecurrenceType } from '@prisma/client'
+import { RecurrenceType } from '@/generated/prisma/index'
 
 describe('chore-schedule', () => {
   describe('generateChoreInstances', () => {

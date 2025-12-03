@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { signOut } from "next-auth/react"
-import { format, isToday, isTomorrow, isPast } from "date-fns"
+import { isToday, isTomorrow, isPast } from "date-fns"
 import { formatInTimeZone } from "date-fns-tz"
 import { useRouter } from "next/navigation"
 import Link from "next/link"

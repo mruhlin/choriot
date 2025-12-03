@@ -5,8 +5,7 @@ import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
 
 export const authOptions: NextAuthOptions = {
-  // @ts-expect-error - PrismaAdapter type mismatch with custom output path
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma as any),
   providers: [
     CredentialsProvider({
       name: "credentials",

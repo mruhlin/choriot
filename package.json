@@ -11,7 +11,11 @@
     "test": "TZ=UTC jest",
     "test:watch": "TZ=UTC jest --watch",
     "test:coverage": "TZ=UTC jest --coverage",
-    "test:ci": "npm run typecheck && npm run lint && npm test"
+    "test:ci": "npm run typecheck && npm run lint && npm test",
+    "postinstall": "prisma generate",
+    "migrate:deploy": "./scripts/migrate.sh deploy",
+    "migrate:status": "./scripts/migrate.sh status",
+    "migrate:reset": "./scripts/migrate.sh reset"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

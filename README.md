@@ -1,5 +1,7 @@
 ![logo](./public/logo.png)
 
+🚀 **[View Live App](https://choriot.vercel.app)**
+
 # Choriot - The Chore Tracker that Carries your Chores to Completion
 
 A Next.js application for tracking family chores with recurring tasks, group management, and completion history.

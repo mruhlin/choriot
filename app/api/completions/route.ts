@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, unauthorizedResponse } from "@/lib/auth-helpers"
-import { Prisma } from "@prisma/client"
+import { Prisma } from "@/generated/prisma/index"
 
 // GET /api/completions - Get completion history
 export async function GET(req: Request) {

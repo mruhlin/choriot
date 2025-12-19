@@ -10,3 +10,4 @@ Use the following process for adding new functionality to the app:
 - Open a pull request in guthub to merge your branch into `main`.  The title should be a brief human readable description of the issue, and should reference the github issue number if there is one (i.e. "Fix Time Zone Bug (fix #1234)")
 - If the user asks for further changes, commit and push them to the same branch
 - The user will merge the PR when done
+

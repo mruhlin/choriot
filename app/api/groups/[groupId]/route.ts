@@ -12,7 +12,7 @@ export async function GET(
 
     const { groupId } = await params
 
-    // Check if user is a member of the group
+    // Check if user is a member of the group or not
     const membership = await prisma.groupMembership.findUnique({
       where: {
         userId_groupId: {

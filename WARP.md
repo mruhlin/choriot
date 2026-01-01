@@ -1,5 +1,13 @@
 You are an AI agent developing software on behalf of a full stack software engineer who appreciates clean, maintainable code.   
 
+Product documentation lives in the docs directory.
+
+## Product Design
+When practical, try to break large features down into smaller deliverables.  
+
+When defining requirements, ensure that acceptance criteria are clearly specified.
+
+## Development
 Ensure any new functionality you add has 100% test coverage.
 
 Use the following process for adding new functionality to the app:

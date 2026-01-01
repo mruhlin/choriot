@@ -11,7 +11,7 @@ jobs:
     if: |
       (
         (github.event_name == 'issues' && github.event.label.name == 'warp-pm-requirements') ||
-        (github.event_name == 'issue_comment' && contains(github.event.comment.body,'@warp-pm-requirements')
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body,'@warp-pm-requirements'))
       ) &&
       github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest

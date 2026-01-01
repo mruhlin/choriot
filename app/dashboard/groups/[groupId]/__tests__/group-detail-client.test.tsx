@@ -1,0 +1,488 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { useRouter } from 'next/navigation'
+import '@testing-library/jest-dom'
+import GroupDetailClient from '../group-detail-client'
+
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+}))
+
+describe('GroupDetailClient', () => {
+  const mockRouter = {
+    push: jest.fn(),
+    refresh: jest.fn(),
+  }
+
+  const mockGroup = {
+    id: 'group-1',
+    name: 'Family',
+    description: 'Family chores',
+    memberships: [
+      {
+        id: 'membership-1',
+        userId: 'user-1',
+        groupId: 'group-1',
+        role: 'ADMIN' as const,
+        joinedAt: new Date('2024-01-01'),
+        user: {
+          id: 'user-1',
+          name: 'Alice',
+          email: 'alice@example.com',
+        },
+      },
+      {
+        id: 'membership-2',
+        userId: 'user-2',
+        groupId: 'group-1',
+        role: 'MEMBER' as const,
+        joinedAt: new Date('2024-01-02'),
+        user: {
+          id: 'user-2',
+          name: 'Bob',
+          email: 'bob@example.com',
+        },
+      },
+    ],
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+    global.fetch = jest.fn()
+  })
+
+  describe('Rendering', () => {
+    it('should render group name and description', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      expect(screen.getByText('Family')).toBeInTheDocument()
+      expect(screen.getByText('Family chores')).toBeInTheDocument()
+    })
+
+    it('should render group without description', () => {
+      const groupNoDesc = { ...mockGroup, description: null }
+      render(
+        <GroupDetailClient
+          group={groupNoDesc}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      expect(screen.getByText('Family')).toBeInTheDocument()
+      expect(screen.queryByText('Family chores')).not.toBeInTheDocument()
+    })
+
+    it('should render back to groups link', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const link = screen.getByRole('link', { name: /back to groups/i })
+      expect(link).toHaveAttribute('href', '/dashboard/groups')
+    })
+  })
+
+  describe('Members List', () => {
+    it('should display all members with their details', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      expect(screen.getByText('Members (2)')).toBeInTheDocument()
+      expect(screen.getByText('Alice')).toBeInTheDocument()
+      expect(screen.getByText('alice@example.com')).toBeInTheDocument()
+      expect(screen.getByText('Bob')).toBeInTheDocument()
+      expect(screen.getByText('bob@example.com')).toBeInTheDocument()
+    })
+
+    it('should display ADMIN badge for admin users', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const adminBadges = screen.getAllByText('ADMIN')
+      expect(adminBadges).toHaveLength(1)
+    })
+
+    it('should mark current user with "(You)" label', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      expect(screen.getByText('(You)')).toBeInTheDocument()
+    })
+
+    it('should display member email when name is null', () => {
+      const groupWithNoName = {
+        ...mockGroup,
+        memberships: [
+          {
+            ...mockGroup.memberships[0],
+            user: { ...mockGroup.memberships[0].user, name: null },
+          },
+        ],
+      }
+
+      render(
+        <GroupDetailClient
+          group={groupWithNoName}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      // Email should appear both as display name and in details
+      const emailElements = screen.getAllByText('alice@example.com')
+      expect(emailElements.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Add Member Section - Admin View', () => {
+    it('should display add member form for admin users', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      expect(screen.getByRole('heading', { name: 'Add Member' })).toBeInTheDocument()
+      expect(screen.getByLabelText(/email address/i)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /add member/i })).toBeInTheDocument()
+    })
+
+    it('should NOT display add member form for non-admin users', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-2"
+          isAdmin={false}
+        />
+      )
+
+      expect(screen.queryByRole('heading', { name: 'Add Member' })).not.toBeInTheDocument()
+      expect(screen.queryByLabelText(/email address/i)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Add Member Functionality', () => {
+    it('should successfully add a member', async () => {
+      const mockResponse = {
+        user: {
+          id: 'user-3',
+          name: 'Charlie',
+          email: 'charlie@example.com',
+        },
+        role: 'MEMBER',
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      })
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      fireEvent.change(emailInput, { target: { value: 'charlie@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('/api/groups/group-1/invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'charlie@example.com' }),
+        })
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText('Charlie has been added to the group')).toBeInTheDocument()
+      })
+
+      expect(mockRouter.refresh).toHaveBeenCalled()
+      expect(emailInput).toHaveValue('')
+    })
+
+    it('should display success message with email when name is null', async () => {
+      const mockResponse = {
+        user: {
+          id: 'user-3',
+          name: null,
+          email: 'charlie@example.com',
+        },
+        role: 'MEMBER',
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      })
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      fireEvent.change(emailInput, { target: { value: 'charlie@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('charlie@example.com has been added to the group')).toBeInTheDocument()
+      })
+    })
+
+    it('should display "User not found" error', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: 'User not found' }),
+      })
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      fireEvent.change(emailInput, { target: { value: 'nonexistent@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('User not found')).toBeInTheDocument()
+      })
+
+      expect(mockRouter.refresh).not.toHaveBeenCalled()
+    })
+
+    it('should display "User is already a member" error', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: 'User is already a member' }),
+      })
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      fireEvent.change(emailInput, { target: { value: 'bob@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('User is already a member')).toBeInTheDocument()
+      })
+    })
+
+    it('should display generic error for network failures', async () => {
+      ;(global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Something went wrong')).toBeInTheDocument()
+      })
+    })
+
+    it('should display fallback error message when error field is missing', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({}),
+      })
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed to add member')).toBeInTheDocument()
+      })
+    })
+
+    it('should disable button and show loading state during submission', async () => {
+      ;(global.fetch as jest.Mock).mockImplementationOnce(() => 
+        new Promise((resolve) => setTimeout(() => resolve({
+          ok: true,
+          json: async () => ({
+            user: { id: 'user-3', name: 'Charlie', email: 'charlie@example.com' },
+          }),
+        }), 100))
+      )
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      fireEvent.change(emailInput, { target: { value: 'charlie@example.com' } })
+      fireEvent.click(submitButton)
+
+      expect(screen.getByRole('button', { name: /adding.../i })).toBeDisabled()
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /add member/i })).not.toBeDisabled()
+      })
+    })
+
+    it('should clear error message when submitting new request', async () => {
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: false,
+          json: async () => ({ error: 'User not found' }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            user: { id: 'user-3', name: 'Charlie', email: 'charlie@example.com' },
+          }),
+        })
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      // First submission - error
+      fireEvent.change(emailInput, { target: { value: 'wrong@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('User not found')).toBeInTheDocument()
+      })
+
+      // Second submission - success
+      fireEvent.change(emailInput, { target: { value: 'charlie@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.queryByText('User not found')).not.toBeInTheDocument()
+        expect(screen.getByText('Charlie has been added to the group')).toBeInTheDocument()
+      })
+    })
+
+    it('should clear success message when submitting new request', async () => {
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            user: { id: 'user-3', name: 'Charlie', email: 'charlie@example.com' },
+          }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            user: { id: 'user-4', name: 'David', email: 'david@example.com' },
+          }),
+        })
+
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+        />
+      )
+
+      const emailInput = screen.getByLabelText(/email address/i)
+      const submitButton = screen.getByRole('button', { name: /add member/i })
+
+      // First submission
+      fireEvent.change(emailInput, { target: { value: 'charlie@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Charlie has been added to the group')).toBeInTheDocument()
+      })
+
+      // Second submission
+      fireEvent.change(emailInput, { target: { value: 'david@example.com' } })
+      fireEvent.click(submitButton)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Charlie has been added to the group')).not.toBeInTheDocument()
+        expect(screen.getByText('David has been added to the group')).toBeInTheDocument()
+      })
+    })
+  })
+})

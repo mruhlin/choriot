@@ -1,5 +1,7 @@
 You are an AI agent developing software on behalf of a full stack software engineer who appreciates clean, maintainable code.   
 
+Product documentation lives in the docs directory.
+
 ## Product Design
 When practical, try to break large features down into smaller deliverables.  
 

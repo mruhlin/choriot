@@ -25,11 +25,9 @@ jobs:
         id: generate-prompt
         run: |
           DELIMITER="$(openssl rand -hex 16)"
-          {
-            echo "prompt<<${DELIMITER}"
-            envsubst < agents/pm-requirements.md
-            echo "${DELIMITER}"
-          } >> "$GITHUB_OUTPUT"
+          echo "prompt<<${DELIMITER}" >> "$GITHUB_OUTPUT"
+          envsubst < agents/pm-requirements.md >> "$GITHUB_OUTPUT"
+          echo "${DELIMITER}" >> "$GITHUB_OUTPUT"
 
       - name: Let warp agent write PM requirements
         uses: warpdotdev/warp-agent-action@main

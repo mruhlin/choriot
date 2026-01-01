@@ -24,11 +24,9 @@ jobs:
       - name: Generate prompt
         id: generate-prompt
         run: |
-          envsubst < agents/pm-requirements.md > $PROMPT_OUTPUT
-          # Use a unique delimiter (like EOF) for multiline strings
           {
-            echo 'full_stdout<<EOF'
-            cat "$PROMPT_OUTPUT"
+            echo 'prompt<<EOF'
+            envsubst < agents/pm-requirements.md
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
@@ -36,4 +34,4 @@ jobs:
         uses: warpdotdev/warp-agent-action@main
         with:
           warp_api_key: ${{ secrets.WARP_API_KEY }}
-          prompt: ${{ steps.generate-prompt.outputs.full_stdout }}
+          prompt: ${{ steps.generate-prompt.outputs.prompt }}

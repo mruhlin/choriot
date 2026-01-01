@@ -27,6 +27,7 @@ jobs:
           DELIMITER="$(openssl rand -hex 16)"
           echo "prompt<<${DELIMITER}" >> "$GITHUB_OUTPUT"
           envsubst < agents/pm-requirements.md >> "$GITHUB_OUTPUT"
+          echo "" >> "$GITHUB_OUTPUT"
           echo "${DELIMITER}" >> "$GITHUB_OUTPUT"
 
       - name: Let warp agent write PM requirements

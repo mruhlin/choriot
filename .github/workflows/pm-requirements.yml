@@ -24,10 +24,11 @@ jobs:
       - name: Generate prompt
         id: generate-prompt
         run: |
+          DELIMITER="$(openssl rand -hex 16)"
           {
-            echo 'prompt<<EOF'
+            echo "prompt<<${DELIMITER}"
             envsubst < agents/pm-requirements.md
-            echo EOF
+            echo "${DELIMITER}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Let warp agent write PM requirements

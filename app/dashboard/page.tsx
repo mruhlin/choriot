@@ -88,9 +88,21 @@ export default async function DashboardPage() {
     }
   })
 
+  // Fetch pending invitations count
+  const pendingInvitationsCount = await prisma.groupInvitation.count({
+    where: {
+      invitedEmail: userData.email,
+      status: "PENDING",
+      expiresAt: {
+        gt: new Date()
+      }
+    }
+  })
+
   return <DashboardClient 
     user={{...userData}} 
     choreInstances={choreInstances}
     groups={groups}
+    pendingInvitationsCount={pendingInvitationsCount}
   />
 }

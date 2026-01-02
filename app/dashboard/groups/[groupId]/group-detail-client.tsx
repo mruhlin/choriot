@@ -26,18 +26,28 @@ interface Group {
   memberships: Membership[]
 }
 
+interface PendingInvitation {
+  id: string
+  invitedEmail: string
+  createdAt: Date
+  expiresAt: Date
+}
+
 interface GroupDetailClientProps {
   group: Group
   currentUserId: string
   isAdmin: boolean
+  pendingInvitations: PendingInvitation[]
 }
 
-export default function GroupDetailClient({ group, currentUserId, isAdmin }: GroupDetailClientProps) {
+export default function GroupDetailClient({ group, currentUserId, isAdmin, pendingInvitations: initialInvitations }: GroupDetailClientProps) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [pendingInvitations, setPendingInvitations] = useState(initialInvitations)
+  const [canceling, setCanceling] = useState<string | null>(null)
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,13 +69,39 @@ export default function GroupDetailClient({ group, currentUserId, isAdmin }: Gro
         return
       }
 
-      setSuccess(`${data.user.name || data.user.email} has been added to the group`)
+      setSuccess(`Invitation sent to ${email}`)
       setEmail("")
+      setPendingInvitations([data, ...pendingInvitations])
       router.refresh()
     } catch (_error) {
       setError("Something went wrong")
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCancelInvitation = async (invitationId: string) => {
+    setCanceling(invitationId)
+    setError("")
+
+    try {
+      const response = await fetch(`/api/invitations/${invitationId}/cancel`, {
+        method: "DELETE",
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Failed to cancel invitation")
+        return
+      }
+
+      setPendingInvitations(pendingInvitations.filter(inv => inv.id !== invitationId))
+      router.refresh()
+    } catch (_error) {
+      setError("Something went wrong")
+    } finally {
+      setCanceling(null)
     }
   }
 
@@ -93,6 +129,43 @@ export default function GroupDetailClient({ group, currentUserId, isAdmin }: Gro
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Pending Invitations (Admin Only) */}
+        {isAdmin && pendingInvitations.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Pending Invitations ({pendingInvitations.length})
+            </h2>
+            <div className="space-y-3">
+              {pendingInvitations.map((invitation) => (
+                <div
+                  key={invitation.id}
+                  className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-0"
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {invitation.invitedEmail}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Invited {new Date(invitation.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                      PENDING
+                    </span>
+                    <button
+                      onClick={() => handleCancelInvitation(invitation.id)}
+                      disabled={canceling === invitation.id}
+                      className="text-sm text-red-600 dark:text-red-400 hover:underline disabled:opacity-50"
+                    >
+                      {canceling === invitation.id ? "..." : "Cancel"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Members List */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">

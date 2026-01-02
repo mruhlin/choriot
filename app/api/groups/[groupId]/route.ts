@@ -58,7 +58,36 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(group)
+    // Include pending invitations if user is admin
+    let pendingInvitations: Array<{
+      id: string
+      groupId: string
+      invitedByUserId: string
+      invitedEmail: string
+      status: string
+      createdAt: Date
+      expiresAt: Date
+      respondedAt: Date | null
+    }> = []
+    if (membership.role === "ADMIN") {
+      pendingInvitations = await prisma.groupInvitation.findMany({
+        where: {
+          groupId,
+          status: "PENDING",
+          expiresAt: {
+            gt: new Date()
+          }
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
+      })
+    }
+
+    return NextResponse.json({
+      ...group,
+      pendingInvitations
+    })
   } catch (_error) {
     return NextResponse.json(
       { error: "Internal server error" },

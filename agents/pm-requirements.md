@@ -13,4 +13,4 @@ Issue Body: ${ISSUE_BODY}
 4. Consider breaking the feature up into separate deliverables.
 5. For each deliverable:
   a. If there's already a sub-issue associated with it, update the requirements and acceptance criteria on that sub-issue as needed.
-  b. If there's not already a sub-issue associated with it, create a new sub-issue with requirements and acceptance criteria.
+  b. If there's not already a sub-issue associated with it, create a new sub-issue with requirements and acceptance criteria.  Set this issue as the parent.

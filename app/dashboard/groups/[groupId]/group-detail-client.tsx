@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Image from "next/image"
+import SimpleHeader from "@/components/SimpleHeader"
 
 interface User {
   id: string
@@ -109,26 +109,19 @@ export default function GroupDetailClient({ group, currentUserId, isAdmin, pendi
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              {group.name}
-            </h1>
-            <Link
-              href="/dashboard/groups"
-              className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              ← Back to Groups
-            </Link>
-          </div>
-          {group.description && (
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+      <SimpleHeader
+        title={group.name}
+        backLink={{ href: "/dashboard/groups", label: "Back to Groups" }}
+      />
+      {group.description && (
+        <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               {group.description}
             </p>
-          )}
+          </div>
         </div>
-      </header>
+      )}
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Pending Invitations (Admin Only) */}

@@ -15,6 +15,20 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }))
 
+jest.mock('@/components/SimpleHeader', () => {
+  const MockSimpleHeader = ({ title, backLink, children }: { title: string; backLink: { href: string; label: string }; children?: React.ReactNode }) => {
+    return (
+      <header>
+        <h1>{title}</h1>
+        <a href={backLink.href}>{backLink.label}</a>
+        {children}
+      </header>
+    )
+  }
+  MockSimpleHeader.displayName = 'SimpleHeader'
+  return MockSimpleHeader
+})
+
 describe('GroupDetailClient', () => {
   const mockRouter = {
     push: jest.fn(),

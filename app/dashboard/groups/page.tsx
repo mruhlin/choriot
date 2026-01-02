@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import SimpleHeader from "@/components/SimpleHeader"
 
 export default async function GroupsPage() {
   const session = await getServerSession(authOptions)
@@ -31,29 +32,17 @@ export default async function GroupsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              Your Groups
-            </h1>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/dashboard/groups/new"
-                className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700 dark:hover:bg-indigo-600"
-              >
-                Create Group
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-              >
-                ← Back to Dashboard
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SimpleHeader
+        title="Your Groups"
+        backLink={{ href: "/dashboard", label: "Back to Dashboard" }}
+      >
+        <Link
+          href="/dashboard/groups/new"
+          className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700 dark:hover:bg-indigo-600"
+        >
+          Create Group
+        </Link>
+      </SimpleHeader>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {groups.length === 0 ? (

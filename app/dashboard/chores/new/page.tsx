@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
+import SimpleHeader from "@/components/SimpleHeader"
 
 export default function NewChorePage() {
   const router = useRouter()
@@ -124,21 +125,10 @@ export default function NewChorePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              Create New Chore
-            </h1>
-            <Link
-              href="/dashboard"
-              className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              ← Back to Dashboard
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SimpleHeader
+        title="Create New Chore"
+        backLink={{ href: "/dashboard", label: "Back to Dashboard" }}
+      />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">

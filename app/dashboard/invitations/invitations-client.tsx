@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { formatInTimeZone } from "date-fns-tz"
+import SimpleHeader from "@/components/SimpleHeader"
 
 interface Invitation {
   id: string
@@ -87,21 +88,10 @@ export default function InvitationsClient({ invitations: initialInvitations, use
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              Group Invitations
-            </h1>
-            <Link
-              href="/dashboard"
-              className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              ← Back to Dashboard
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SimpleHeader
+        title="Group Invitations"
+        backLink={{ href: "/dashboard", label: "Back to Dashboard" }}
+      />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (

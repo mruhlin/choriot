@@ -11,15 +11,24 @@ export default async function CompletedPage() {
     redirect("/login")
   }
 
-  // Fetch full user data including timezone
+  // Fetch full user data including timezone and image
   const userData = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, timezone: true }
+    select: { id: true, name: true, email: true, timezone: true, image: true }
   })
 
   if (!userData) {
     redirect("/login")
   }
+
+  // Count pending invitations
+  const pendingInvitationsCount = await prisma.groupInvitation.count({
+    where: {
+      invitedEmail: userData.email,
+      status: "PENDING",
+      expiresAt: { gt: new Date() }
+    }
+  })
 
   // Get all groups user is a member of
   const userGroupIds = await prisma.groupMembership.findMany({
@@ -69,5 +78,5 @@ export default async function CompletedPage() {
     take: 50 // Initial page size
   })
 
-  return <CompletedClient user={{...userData}} completions={completions} />
+  return <CompletedClient user={{...userData}} completions={completions} pendingInvitationsCount={pendingInvitationsCount} />
 }

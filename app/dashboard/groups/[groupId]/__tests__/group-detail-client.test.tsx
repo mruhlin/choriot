@@ -3,6 +3,14 @@ import { useRouter } from 'next/navigation'
 import '@testing-library/jest-dom'
 import GroupDetailClient from '../group-detail-client'
 
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: React.ComponentProps<'img'>) => {
+    // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
+    return <img {...props} />
+  },
+}))
+
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }))
@@ -28,6 +36,7 @@ describe('GroupDetailClient', () => {
           id: 'user-1',
           name: 'Alice',
           email: 'alice@example.com',
+          image: 'https://example.com/alice.jpg',
         },
       },
       {
@@ -40,6 +49,7 @@ describe('GroupDetailClient', () => {
           id: 'user-2',
           name: 'Bob',
           email: 'bob@example.com',
+          image: null,
         },
       },
     ],
@@ -164,6 +174,250 @@ describe('GroupDetailClient', () => {
       // Email should appear both as display name and in details
       const emailElements = screen.getAllByText('alice@example.com')
       expect(emailElements.length).toBeGreaterThan(0)
+    })
+
+    it('should display profile image for users with images', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      expect(aliceImage).toBeInTheDocument()
+      expect(aliceImage).toHaveAttribute('src', 'https://example.com/alice.jpg')
+      expect(aliceImage).toHaveAttribute('width', '48')
+      expect(aliceImage).toHaveAttribute('height', '48')
+    })
+
+    it('should display default avatar when user has no profile image', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const bobImage = screen.getByAltText('Bob')
+      expect(bobImage).toBeInTheDocument()
+      expect(bobImage).toHaveAttribute('src', '/logo.png')
+    })
+
+    it('should apply circular styling to profile images', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      expect(aliceImage).toHaveClass('rounded-full')
+      expect(aliceImage).toHaveClass('object-cover')
+    })
+
+    it('should display all member profile images', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      const bobImage = screen.getByAltText('Bob')
+
+      expect(aliceImage).toBeInTheDocument()
+      expect(bobImage).toBeInTheDocument()
+    })
+
+    it('should use email as alt text when name is null', () => {
+      const groupWithNoName = {
+        ...mockGroup,
+        memberships: [
+          {
+            ...mockGroup.memberships[0],
+            user: { ...mockGroup.memberships[0].user, name: null },
+          },
+        ],
+      }
+
+      render(
+        <GroupDetailClient
+          group={groupWithNoName}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const image = screen.getByAltText('alice@example.com')
+      expect(image).toBeInTheDocument()
+    })
+
+    it('should handle image loading errors by falling back to default avatar', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice') as HTMLImageElement
+      
+      // Simulate image load error
+      fireEvent.error(aliceImage)
+
+      expect(aliceImage.src).toContain('/logo.png')
+    })
+  })
+
+  describe('Profile Images', () => {
+    it('should display profile image for user with image set', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      expect(aliceImage).toBeInTheDocument()
+      expect(aliceImage).toHaveAttribute('src', 'https://example.com/alice.jpg')
+      expect(aliceImage).toHaveAttribute('width', '48')
+      expect(aliceImage).toHaveAttribute('height', '48')
+    })
+
+    it('should display default avatar for user without image', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const bobImage = screen.getByAltText('Bob')
+      expect(bobImage).toBeInTheDocument()
+      expect(bobImage).toHaveAttribute('src', '/logo.png')
+    })
+
+    it('should display email as alt text when name is null', () => {
+      const groupWithNoName = {
+        ...mockGroup,
+        memberships: [
+          {
+            ...mockGroup.memberships[0],
+            user: { ...mockGroup.memberships[0].user, name: null },
+          },
+        ],
+      }
+
+      render(
+        <GroupDetailClient
+          group={groupWithNoName}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const image = screen.getByAltText('alice@example.com')
+      expect(image).toBeInTheDocument()
+    })
+
+    it('should apply rounded-full class for circular images', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      expect(aliceImage).toHaveClass('rounded-full')
+    })
+
+    it('should apply object-cover class for consistent image display', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      expect(aliceImage).toHaveClass('object-cover')
+    })
+
+    it('should handle image loading errors by falling back to default avatar', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice') as HTMLImageElement
+      
+      // Simulate image load error
+      fireEvent.error(aliceImage)
+      
+      // The src will be an absolute URL, so we check if it ends with /logo.png
+      expect(aliceImage.src).toMatch(/\/logo\.png$/)
+    })
+
+    it('should display profile images for all members', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const images = screen.getAllByRole('img')
+      // Should have one image per member
+      expect(images.length).toBe(mockGroup.memberships.length)
+    })
+
+    it('should position images to the left of user information', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const membershipElements = screen.getByText('Alice').closest('div.flex.items-center.gap-3')
+      expect(membershipElements).toBeInTheDocument()
+      
+      // The image container should have flex-shrink-0 class
+      const imageContainer = membershipElements?.querySelector('.flex-shrink-0')
+      expect(imageContainer).toBeInTheDocument()
     })
   })
 

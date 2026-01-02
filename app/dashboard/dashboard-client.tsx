@@ -141,6 +141,12 @@ export default function DashboardClient({ user, choreInstances: initialInstances
               Groups
             </Link>
             <Link
+              href="/dashboard/profile"
+              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              Profile
+            </Link>
+            <Link
               href="/dashboard/chores/new"
               className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700 dark:hover:bg-indigo-600"
             >

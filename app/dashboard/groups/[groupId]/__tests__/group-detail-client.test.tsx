@@ -3,6 +3,15 @@ import { useRouter } from 'next/navigation'
 import '@testing-library/jest-dom'
 import GroupDetailClient from '../group-detail-client'
 
+// Mock next/image
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
+    return <img {...props} />
+  },
+}))
+
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }))
@@ -174,6 +183,113 @@ describe('GroupDetailClient', () => {
       // Email should appear both as display name and in details
       const emailElements = screen.getAllByText('alice@example.com')
       expect(emailElements.length).toBeGreaterThan(0)
+    })
+
+    it('should display profile image for users with images', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      expect(aliceImage).toBeInTheDocument()
+      expect(aliceImage).toHaveAttribute('src', 'https://example.com/alice.jpg')
+      expect(aliceImage).toHaveAttribute('width', '48')
+      expect(aliceImage).toHaveAttribute('height', '48')
+    })
+
+    it('should display default avatar when user has no profile image', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const bobImage = screen.getByAltText('Bob')
+      expect(bobImage).toBeInTheDocument()
+      expect(bobImage).toHaveAttribute('src', '/logo.png')
+    })
+
+    it('should apply circular styling to profile images', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      expect(aliceImage).toHaveClass('rounded-full')
+      expect(aliceImage).toHaveClass('object-cover')
+      expect(aliceImage).toHaveClass('flex-shrink-0')
+    })
+
+    it('should display all member profile images', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice')
+      const bobImage = screen.getByAltText('Bob')
+
+      expect(aliceImage).toBeInTheDocument()
+      expect(bobImage).toBeInTheDocument()
+    })
+
+    it('should use email as alt text when name is null', () => {
+      const groupWithNoName = {
+        ...mockGroup,
+        memberships: [
+          {
+            ...mockGroup.memberships[0],
+            user: { ...mockGroup.memberships[0].user, name: null },
+          },
+        ],
+      }
+
+      render(
+        <GroupDetailClient
+          group={groupWithNoName}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const image = screen.getByAltText('alice@example.com')
+      expect(image).toBeInTheDocument()
+    })
+
+    it('should handle image loading errors by falling back to default avatar', () => {
+      render(
+        <GroupDetailClient
+          group={mockGroup}
+          currentUserId="user-1"
+          isAdmin={true}
+          pendingInvitations={[]}
+        />
+      )
+
+      const aliceImage = screen.getByAltText('Alice') as HTMLImageElement
+      
+      // Simulate image load error
+      fireEvent.error(aliceImage)
+
+      expect(aliceImage.src).toContain('/logo.png')
     })
   })
 

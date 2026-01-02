@@ -56,7 +56,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(mockFile),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -70,7 +70,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(null),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -87,7 +87,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -107,7 +107,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -135,7 +135,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -175,7 +175,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -203,7 +203,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -231,7 +231,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -251,7 +251,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 
@@ -277,7 +277,7 @@ describe('/api/user/profile-image', () => {
         formData: jest.fn().mockResolvedValue({
           get: jest.fn().mockReturnValue(file),
         }),
-      } as Request
+      } as unknown as Request
 
       const response = await POST(req)
 

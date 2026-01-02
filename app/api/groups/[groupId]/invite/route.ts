@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, unauthorizedResponse } from "@/lib/auth-helpers"
 import { z } from "zod"
+import { addDays } from "date-fns"
 
 const inviteSchema = z.object({
   email: z.string().email(),
@@ -36,25 +37,11 @@ export async function POST(
       )
     }
 
-    // Find user to invite
-    const invitedUser = await prisma.user.findUnique({
-      where: { email }
-    })
-
-    if (!invitedUser) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      )
-    }
-
     // Check if user is already a member
-    const existingMembership = await prisma.groupMembership.findUnique({
+    const existingMembership = await prisma.groupMembership.findFirst({
       where: {
-        userId_groupId: {
-          userId: invitedUser.id,
-          groupId,
-        }
+        groupId,
+        user: { email }
       }
     })
 
@@ -65,15 +52,39 @@ export async function POST(
       )
     }
 
-    // Add user to group
-    const newMembership = await prisma.groupMembership.create({
-      data: {
-        userId: invitedUser.id,
+    // Check for existing pending invitation
+    const existingInvitation = await prisma.groupInvitation.findFirst({
+      where: {
         groupId,
-        role: "MEMBER"
+        invitedEmail: email,
+        status: "PENDING"
+      }
+    })
+
+    if (existingInvitation) {
+      return NextResponse.json(
+        { error: "Invitation already sent" },
+        { status: 400 }
+      )
+    }
+
+    // Create invitation
+    const expiresAt = addDays(new Date(), 7)
+    const invitation = await prisma.groupInvitation.create({
+      data: {
+        groupId,
+        invitedByUserId: user.id,
+        invitedEmail: email,
+        expiresAt,
       },
       include: {
-        user: {
+        group: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
+        invitedBy: {
           select: {
             id: true,
             name: true,
@@ -83,7 +94,7 @@ export async function POST(
       }
     })
 
-    return NextResponse.json(newMembership, { status: 201 })
+    return NextResponse.json(invitation, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

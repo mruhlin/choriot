@@ -58,6 +58,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -72,6 +73,7 @@ describe('GroupDetailClient', () => {
           group={groupNoDesc}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -85,6 +87,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -100,6 +103,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -116,6 +120,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -129,6 +134,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -151,6 +157,7 @@ describe('GroupDetailClient', () => {
           group={groupWithNoName}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -167,6 +174,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -181,6 +189,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-2"
           isAdmin={false}
+          pendingInvitations={[]}
         />
       )
 
@@ -210,6 +219,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -228,7 +238,7 @@ describe('GroupDetailClient', () => {
       })
 
       await waitFor(() => {
-        expect(screen.getByText('Charlie has been added to the group')).toBeInTheDocument()
+        expect(screen.getByText('Invitation sent to charlie@example.com')).toBeInTheDocument()
       })
 
       expect(mockRouter.refresh).toHaveBeenCalled()
@@ -255,6 +265,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -265,7 +276,7 @@ describe('GroupDetailClient', () => {
       fireEvent.click(submitButton)
 
       await waitFor(() => {
-        expect(screen.getByText('charlie@example.com has been added to the group')).toBeInTheDocument()
+        expect(screen.getByText('Invitation sent to charlie@example.com')).toBeInTheDocument()
       })
     })
 
@@ -280,6 +291,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -307,6 +319,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -329,6 +342,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -354,6 +368,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -383,6 +398,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -417,6 +433,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -437,7 +454,7 @@ describe('GroupDetailClient', () => {
 
       await waitFor(() => {
         expect(screen.queryByText('User not found')).not.toBeInTheDocument()
-        expect(screen.getByText('Charlie has been added to the group')).toBeInTheDocument()
+        expect(screen.getByText('Invitation sent to charlie@example.com')).toBeInTheDocument()
       })
     })
 
@@ -461,6 +478,7 @@ describe('GroupDetailClient', () => {
           group={mockGroup}
           currentUserId="user-1"
           isAdmin={true}
+          pendingInvitations={[]}
         />
       )
 
@@ -472,7 +490,7 @@ describe('GroupDetailClient', () => {
       fireEvent.click(submitButton)
 
       await waitFor(() => {
-        expect(screen.getByText('Charlie has been added to the group')).toBeInTheDocument()
+        expect(screen.getByText('Invitation sent to charlie@example.com')).toBeInTheDocument()
       })
 
       // Second submission
@@ -480,8 +498,8 @@ describe('GroupDetailClient', () => {
       fireEvent.click(submitButton)
 
       await waitFor(() => {
-        expect(screen.queryByText('Charlie has been added to the group')).not.toBeInTheDocument()
-        expect(screen.getByText('David has been added to the group')).toBeInTheDocument()
+        expect(screen.queryByText('Invitation sent to charlie@example.com')).not.toBeInTheDocument()
+        expect(screen.getByText('Invitation sent to david@example.com')).toBeInTheDocument()
       })
     })
   })

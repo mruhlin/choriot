@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   // Fetch full user data including timezone
   const userData = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, timezone: true }
+    select: { id: true, name: true, email: true, timezone: true, image: true }
   })
 
   if (!userData) {
@@ -88,9 +88,21 @@ export default async function DashboardPage() {
     }
   })
 
+  // Fetch pending invitations count
+  const pendingInvitationsCount = await prisma.groupInvitation.count({
+    where: {
+      invitedEmail: userData.email,
+      status: "PENDING",
+      expiresAt: {
+        gt: new Date()
+      }
+    }
+  })
+
   return <DashboardClient 
     user={{...userData}} 
     choreInstances={choreInstances}
     groups={groups}
+    pendingInvitationsCount={pendingInvitationsCount}
   />
 }

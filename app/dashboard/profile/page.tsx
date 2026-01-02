@@ -18,7 +18,8 @@ export default async function ProfilePage() {
       name: true,
       email: true,
       timezone: true,
-    }
+      image: true,
+    },
   })
 
   if (!user) {

@@ -228,6 +228,27 @@ npm run lint
 npx tsc --noEmit
 ```
 
+## Deployment
+
+### Vercel
+
+This project is deployed on Vercel with automatic deployments for production and preview environments.
+
+#### Preview Environments
+
+Preview deployments are automatically created for each pull request. The project is configured to:
+- Run database migrations automatically during build
+- Use a separate preview database to avoid affecting production
+
+**Important**: You must configure a separate `DATABASE_URL` environment variable in Vercel for preview environments. See [docs/vercel-preview-database.md](docs/vercel-preview-database.md) for detailed setup instructions.
+
+#### Build Configuration
+
+The `vercel.json` file configures Vercel to:
+1. Generate Prisma Client
+2. Run pending migrations with `prisma migrate deploy`
+3. Build the Next.js application
+
 ## CI/CD
 
 This project uses GitHub Actions for continuous integration. The CI pipeline runs automatically on:

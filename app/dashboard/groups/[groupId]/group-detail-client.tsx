@@ -3,11 +3,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 
 interface User {
   id: string
   name: string | null
   email: string
+  image: string | null
 }
 
 interface Membership {
@@ -175,23 +177,36 @@ export default function GroupDetailClient({ group, currentUserId, isAdmin, pendi
             {group.memberships.map((membership) => (
               <div
                 key={membership.id}
-                className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-0"
+                className="flex items-center gap-3 py-3 border-b border-gray-200 dark:border-gray-700 last:border-0"
               >
-                <div className="flex-1">
+                <div className="flex-shrink-0">
+                  <Image
+                    src={membership.user.image || "/logo.png"}
+                    alt={membership.user.name || membership.user.email}
+                    width={48}
+                    height={48}
+                    className="rounded-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = "/logo.png"
+                    }}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium text-gray-900 dark:text-white truncate">
                       {membership.user.name || membership.user.email}
                       {membership.userId === currentUserId && (
                         <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(You)</span>
                       )}
                     </p>
                     {membership.role === "ADMIN" && (
-                      <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-2 py-1 rounded">
+                      <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-2 py-1 rounded flex-shrink-0">
                         ADMIN
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                     {membership.user.email}
                   </p>
                 </div>

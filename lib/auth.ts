@@ -51,23 +51,27 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id
+        token.image = user.image
+      }
+      // Refresh token data when explicitly triggered (e.g., after profile update)
+      if (trigger === "update") {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { image: true }
+        })
+        if (dbUser) {
+          token.image = dbUser.image
+        }
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
-        // Fetch latest user data including image
-        const user = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { image: true }
-        })
-        if (user) {
-          session.user.image = user.image
-        }
+        session.user.image = token.image as string | null | undefined
       }
       return session
     }

@@ -1,10 +1,20 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import '@testing-library/jest-dom'
 import ProfileClient from '../profile-client'
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+}))
+
+const mockUpdate = jest.fn()
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(() => ({
+    data: null,
+    status: 'unauthenticated',
+    update: mockUpdate,
+  })),
 }))
 
 jest.mock('next/image', () => ({
@@ -120,6 +130,7 @@ describe('ProfileClient', () => {
       })
 
       await waitFor(() => {
+        expect(mockUpdate).toHaveBeenCalled()
         expect(mockRouter.refresh).toHaveBeenCalled()
       })
     })

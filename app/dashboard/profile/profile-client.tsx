@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -16,6 +17,7 @@ interface ProfileClientProps {
 
 export default function ProfileClient({ user: initialUser }: ProfileClientProps) {
   const router = useRouter()
+  const { update } = useSession()
   const [user, setUser] = useState(initialUser)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -54,6 +56,8 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
 
       if (response.ok) {
         setUser(data.user)
+        // Update the session to refresh the JWT token with new image
+        await update()
         router.refresh()
       } else {
         setError(data.error || "Failed to upload image")

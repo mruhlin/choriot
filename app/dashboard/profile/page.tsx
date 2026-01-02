@@ -17,6 +17,7 @@ export default async function ProfilePage() {
       id: true,
       name: true,
       email: true,
+      timezone: true,
       image: true,
     },
   })

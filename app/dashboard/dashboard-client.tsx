@@ -16,6 +16,7 @@ interface DashboardClientProps {
     name?: string | null
     email: string
     timezone: string
+    image?: string | null
   }
   choreInstances: ChoreInstance[]
   groups: Array<{
@@ -129,9 +130,18 @@ export default function DashboardClient({ user, choreInstances: initialInstances
             <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">Choriot</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              {user.name || user.email}
-            </span>
+            <Link href="/dashboard/profile" className="flex items-center gap-3 hover:opacity-80">
+              <Image
+                src={user.image || "/logo.png"}
+                alt={user.name || "Profile"}
+                width={32}
+                height={32}
+                className="rounded-full object-cover"
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {user.name || user.email}
+              </span>
+            </Link>
             <span className="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-3 py-1 rounded-full text-sm font-medium">
               {totalPoints} pts
             </span>

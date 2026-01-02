@@ -155,7 +155,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
               href="/dashboard/profile"
               className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
             >
-              Profile
+              Profile 
             </Link>
             <Link
               href="/dashboard/invitations"

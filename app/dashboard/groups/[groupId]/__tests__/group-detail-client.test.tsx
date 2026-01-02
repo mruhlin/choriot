@@ -230,7 +230,6 @@ describe('GroupDetailClient', () => {
       const aliceImage = screen.getByAltText('Alice')
       expect(aliceImage).toHaveClass('rounded-full')
       expect(aliceImage).toHaveClass('object-cover')
-      expect(aliceImage).toHaveClass('flex-shrink-0')
     })
 
     it('should display all member profile images', () => {

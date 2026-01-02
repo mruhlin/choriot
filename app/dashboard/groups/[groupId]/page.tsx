@@ -59,11 +59,34 @@ export default async function GroupDetailPage({
 
   const isAdmin = membership.role === "ADMIN"
 
+  // Fetch pending invitations if user is admin
+  let pendingInvitations: Array<{
+    id: string
+    invitedEmail: string
+    createdAt: Date
+    expiresAt: Date
+  }> = []
+  if (isAdmin) {
+    pendingInvitations = await prisma.groupInvitation.findMany({
+      where: {
+        groupId,
+        status: "PENDING",
+        expiresAt: {
+          gt: new Date()
+        }
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    })
+  }
+
   return (
     <GroupDetailClient
       group={group}
       currentUserId={session.user.id}
       isAdmin={isAdmin}
+      pendingInvitations={pendingInvitations}
     />
   )
 }

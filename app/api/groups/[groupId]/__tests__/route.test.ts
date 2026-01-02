@@ -11,6 +11,9 @@ jest.mock('@/lib/prisma', () => ({
     group: {
       findUnique: jest.fn(),
     },
+    groupInvitation: {
+      findMany: jest.fn(),
+    },
   },
 }))
 
@@ -136,6 +139,7 @@ describe('/api/groups/[groupId] GET', () => {
       role: 'ADMIN',
     })
     ;(prisma.group.findUnique as jest.Mock).mockResolvedValue(mockGroup)
+    ;(prisma.groupInvitation.findMany as jest.Mock).mockResolvedValue([])
 
     const req = new Request('http://localhost:3000/api/groups/group-1')
     const params = Promise.resolve({ groupId: 'group-1' })
@@ -143,10 +147,10 @@ describe('/api/groups/[groupId] GET', () => {
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toEqual(mockGroup)
     expect(data.memberships).toHaveLength(2)
     expect(data.memberships[0].user.email).toBe('alice@example.com')
     expect(data.memberships[1].user.email).toBe('bob@example.com')
+    expect(data.pendingInvitations).toEqual([])
   })
 
   it('should include memberships with proper ordering', async () => {
@@ -157,6 +161,7 @@ describe('/api/groups/[groupId] GET', () => {
       role: 'ADMIN',
     })
     ;(prisma.group.findUnique as jest.Mock).mockResolvedValue(mockGroup)
+    ;(prisma.groupInvitation.findMany as jest.Mock).mockResolvedValue([])
 
     const req = new Request('http://localhost:3000/api/groups/group-1')
     const params = Promise.resolve({ groupId: 'group-1' })
@@ -205,7 +210,8 @@ describe('/api/groups/[groupId] GET', () => {
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toEqual(mockGroup)
+    expect(data.memberships).toEqual(mockGroup.memberships)
+    expect(data.pendingInvitations).toEqual([])
   })
 
   it('should return 500 on internal error', async () => {

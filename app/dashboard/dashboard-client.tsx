@@ -25,9 +25,10 @@ interface DashboardClientProps {
       user: { id: string; name: string | null; email: string }
     }>
   }>
+  pendingInvitationsCount: number
 }
 
-export default function DashboardClient({ user, choreInstances: initialInstances, groups }: DashboardClientProps) {
+export default function DashboardClient({ user, choreInstances: initialInstances, groups, pendingInvitationsCount }: DashboardClientProps) {
   const router = useRouter()
   const [choreInstances, setChoreInstances] = useState(initialInstances)
   const [completing, setCompleting] = useState<string | null>(null)
@@ -141,6 +142,17 @@ export default function DashboardClient({ user, choreInstances: initialInstances
               Groups
             </Link>
             <Link
+              href="/dashboard/invitations"
+              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline relative"
+            >
+              Invitations
+              {pendingInvitationsCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {pendingInvitationsCount}
+                </span>
+              )}
+            </Link>
+            <Link
               href="/dashboard/chores/new"
               className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700 dark:hover:bg-indigo-600"
             >
@@ -176,6 +188,27 @@ export default function DashboardClient({ user, choreInstances: initialInstances
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Invitation Banner */}
+        {pendingInvitationsCount > 0 && (
+          <div className="mb-6 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-indigo-800 dark:text-indigo-200">
+                  You have {pendingInvitationsCount} pending group {pendingInvitationsCount === 1 ? "invitation" : "invitations"}
+                </h3>
+                <p className="text-sm text-indigo-600 dark:text-indigo-300 mt-1">
+                  Review and respond to join new groups
+                </p>
+              </div>
+              <Link
+                href="/dashboard/invitations"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700"
+              >
+                View Invitations
+              </Link>
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">

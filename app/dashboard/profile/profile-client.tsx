@@ -9,17 +9,22 @@ import Link from "next/link"
 interface ProfileClientProps {
   user: {
     id: string
-    name?: string | null
+    name: string | null
     email: string
-    timezone: string
+    image: string | null
   }
 }
 
-export default function ProfileClient({ user }: ProfileClientProps) {
+export default function ProfileClient({ user: initialUser }: ProfileClientProps) {
   const router = useRouter()
+  const { update } = useSession()
+  const [user, setUser] = useState(initialUser)
   const [name, setName] = useState(user.name || "")
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,19 +36,23 @@ export default function ProfileClient({ user }: ProfileClientProps) {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name || null }),
-    name: string | null
-    email: string
-    image: string | null
-  }
-}
+      })
 
-export default function ProfileClient({ user: initialUser }: ProfileClientProps) {
-  const router = useRouter()
-  const { update } = useSession()
-  const [user, setUser] = useState(initialUser)
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage({ type: "success", text: "Profile updated successfully!" })
+        setUser(data)
+        router.refresh()
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to update profile" })
+      }
+    } catch (_error) {
+      setMessage({ type: "error", text: "Something went wrong" })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -77,18 +86,6 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
       const data = await response.json()
 
       if (response.ok) {
-        setMessage({ type: "success", text: "Profile updated successfully!" })
-        router.refresh()
-      } else {
-        setMessage({ type: "error", text: data.error || "Failed to update profile" })
-      }
-    } catch (_error) {
-      setMessage({ type: "error", text: "Something went wrong" })
-    } finally {
-      setLoading(false)
-    }
-  }
-
         setUser(data.user)
         // Update the session to refresh the JWT token with new image
         await update()
@@ -131,7 +128,7 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
             href="/dashboard"
             className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
           >
-            ← Back to Dashboard
+            Back to Dashboard
           </Link>
         </div>
       </header>
@@ -186,9 +183,6 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
                 placeholder="Enter your display name"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                This name will be displayed throughout the app
-              </p>
             </div>
 
             {/* Submit button */}
@@ -202,7 +196,9 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
               </button>
             </div>
           </form>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8">
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 mt-6">
           <h2 className="text-2xl font-bold mb-6 dark:text-white">Profile Settings</h2>
 
           {/* Profile Image Section */}
@@ -247,22 +243,22 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
             )}
           </div>
 
-          {/* User Info Section */}
+          {/* User Info Section - Display Only */}
           <div className="border-t dark:border-gray-700 pt-6">
             <h3 className="text-lg font-semibold mb-4 dark:text-white">Account Information</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Name
-                </label>
+                </div>
                 <p className="mt-1 text-sm text-gray-900 dark:text-gray-100">
                   {user.name || "Not set"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email
-                </label>
+                </div>
                 <p className="mt-1 text-sm text-gray-900 dark:text-gray-100">
                   {user.email}
                 </p>

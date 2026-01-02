@@ -156,6 +156,7 @@ export default function DashboardClient({ user, choreInstances: initialInstances
               className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
             >
               Profile
+            </Link>
             <Link
               href="/dashboard/invitations"
               className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline relative"
@@ -410,7 +411,8 @@ export default function DashboardClient({ user, choreInstances: initialInstances
                           <span>
                             {isExpanded ? "▼" : "▶"} {formatInTimeZone(range.startDate, user.timezone, "MMM d")} – {formatInTimeZone(range.endDate, user.timezone, "MMM d")}
                           </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">...
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            ...
                           </span>
                         </button>
                         {isExpanded && (

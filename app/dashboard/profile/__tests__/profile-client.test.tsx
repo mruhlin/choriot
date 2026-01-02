@@ -9,7 +9,6 @@ jest.mock('next/navigation', () => ({
 
 global.fetch = jest.fn()
 
-describe('ProfileClient', () => {
 const mockUpdate = jest.fn()
 jest.mock('next-auth/react', () => ({
   useSession: jest.fn(() => ({
@@ -29,8 +28,12 @@ jest.mock('next/image', () => ({
 
 describe('ProfileClient', () => {
   const mockRouter = {
-    push: jest.fn(),
     refresh: jest.fn(),
+    push: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    prefetch: jest.fn(),
+    replace: jest.fn(),
   }
 
   const mockUser = {
@@ -38,15 +41,6 @@ describe('ProfileClient', () => {
     name: 'Alice',
     email: 'alice@example.com',
     timezone: 'America/Los_Angeles',
-  }
-
-  const mockRouter = {
-    refresh: jest.fn(),
-    push: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    prefetch: jest.fn(),
-    replace: jest.fn(),
     image: 'https://example.com/profile.jpg',
   }
 
@@ -570,8 +564,11 @@ describe('ProfileClient', () => {
       render(<ProfileClient user={mockUser} />)
 
       expect(screen.getByText('Account Information')).toBeInTheDocument()
-      expect(screen.getByText('Name')).toBeInTheDocument()
-      expect(screen.getByText('Email')).toBeInTheDocument()
+      // Name and Email appear in both the form and Account Information section
+      const nameElements = screen.getAllByText('Name')
+      expect(nameElements.length).toBeGreaterThan(0)
+      const emailElements = screen.getAllByText('Email')
+      expect(emailElements.length).toBeGreaterThan(0)
     })
   })
 })

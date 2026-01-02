@@ -60,6 +60,14 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
+        // Fetch latest user data including image
+        const user = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { image: true }
+        })
+        if (user) {
+          session.user.image = user.image
+        }
       }
       return session
     }

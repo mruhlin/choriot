@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   // Fetch full user data including timezone
   const userData = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, timezone: true }
+    select: { id: true, name: true, email: true, timezone: true, image: true }
   })
 
   if (!userData) {

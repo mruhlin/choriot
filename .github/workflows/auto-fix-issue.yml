@@ -15,7 +15,7 @@ jobs:
 
     env:
       DATABASE_URL: file:./test.db
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
     steps:
       - name: Checkout code

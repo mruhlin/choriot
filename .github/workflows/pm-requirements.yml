@@ -22,7 +22,7 @@ jobs:
       ISSUE_TITLE: ${{ github.event.issue.title }}
       ISSUE_NUMBER: ${{ github.event.issue.number }}
       ISSUE_BODY: ${{ github.event.issue.body }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
     steps:
       - name: Post workflow started comment

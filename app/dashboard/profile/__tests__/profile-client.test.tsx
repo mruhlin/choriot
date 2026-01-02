@@ -26,6 +26,20 @@ jest.mock('next/image', () => ({
   },
 }))
 
+jest.mock('@/components/SimpleHeader', () => {
+  const MockSimpleHeader = ({ title, backLink, children }: { title: string; backLink: { href: string; label: string }; children?: React.ReactNode }) => {
+    return (
+      <header>
+        <h1>{title}</h1>
+        <a href={backLink.href}>{backLink.label}</a>
+        {children}
+      </header>
+    )
+  }
+  MockSimpleHeader.displayName = 'SimpleHeader'
+  return MockSimpleHeader
+})
+
 describe('ProfileClient', () => {
   const mockRouter = {
     refresh: jest.fn(),
@@ -54,7 +68,7 @@ describe('ProfileClient', () => {
     render(<ProfileClient user={mockUser} />)
 
     expect(screen.getByText('Profile Settings')).toBeInTheDocument()
-    expect(screen.getByText('Edit Your Profile')).toBeInTheDocument()
+    expect(screen.getAllByText('Edit Your Profile').length).toBeGreaterThan(0)
     expect(screen.getByLabelText('Email')).toHaveValue('alice@example.com')
     expect(screen.getByLabelText('Display Name')).toHaveValue('Alice')
     expect(screen.getByText('Email cannot be changed')).toBeInTheDocument()

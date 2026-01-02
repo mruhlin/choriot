@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
-import Link from "next/link"
+import SimpleHeader from "@/components/SimpleHeader"
 
 interface ProfileClientProps {
   user: {
@@ -111,27 +111,10 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Image 
-              src="/logo.png" 
-              alt="Choriot Logo" 
-              width={40} 
-              height={40}
-              className="object-contain"
-            />
-            <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">Choriot</h1>
-          </div>
-          <Link
-            href="/dashboard"
-            className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
-          >
-            Back to Dashboard
-          </Link>
-        </div>
-      </header>
+      <SimpleHeader
+        title="Edit Your Profile"
+        backLink={{ href: "/dashboard", label: "Back to Dashboard" }}
+      />
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

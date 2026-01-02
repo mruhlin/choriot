@@ -139,7 +139,7 @@ describe('/api/groups/[groupId] GET', () => {
       role: 'ADMIN',
     })
     ;(prisma.group.findUnique as jest.Mock).mockResolvedValue(mockGroup)
-    ;(prisma.groupInvitation.findMany as jest.Mock).mockResolvedValue([])
+    ;(prisma.groupInvitation.findMany as jest.Mock).mockResolvedValue([]) 
 
     const req = new Request('http://localhost:3000/api/groups/group-1')
     const params = Promise.resolve({ groupId: 'group-1' })

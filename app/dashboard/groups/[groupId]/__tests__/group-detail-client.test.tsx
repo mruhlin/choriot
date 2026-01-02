@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation'
 import '@testing-library/jest-dom'
 import GroupDetailClient from '../group-detail-client'
 
-// Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: React.ComponentProps<'img'>) => {
